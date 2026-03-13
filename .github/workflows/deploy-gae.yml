@@ -1,0 +1,44 @@
+name: Deploy to App Engine
+
+on:
+  push:
+    branches: [ "main" ] # 메인 브랜치에 푸시될 때 실행
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    # 1. 승인 프로세스 적용 (Settings > Environments에서 만든 이름과 일치해야 함)
+    environment: production 
+
+    permissions:
+      contents: 'read'
+      id-token: 'write' # WIF 인증을 위해 필수
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # 2. Google Cloud 인증 (WIF 방식)
+    - id: 'auth'
+      name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v2'
+      with:
+        workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+        service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+    # 3. App Engine 배포 실행
+    - id: 'deploy'
+      name: 'Deploy to App Engine'
+      uses: 'google-github-actions/deploy-appengine@v2'
+      with:
+        # 프로젝트 ID (Secrets에 등록해두었다면 사용)
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        # app.yaml 파일이 있는 디렉토리 경로
+        working_directory: ./ 
+        # (선택) 배포 후 즉시 모든 트래픽을 새 버전으로 전환할지 여부
+        promote: true 
+
+    # 4. 배포된 URL 출력 (확인용)
+    - name: 'Show Output'
+      run: 'echo ${{ steps.deploy.outputs.url }}'
