@@ -1,0 +1,6 @@
+runtime: nodejs20
+instance_class: F1  # 가장 저렴한 무료 티어급 사양
+
+# 환경 변수 설정 (필요 시)
+env_variables:
+  NODE_ENV: "production"
