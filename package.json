@@ -1,0 +1,9 @@
+{
+  "name": "gcp-test-app",
+  "version": "1.0.0",
+  "description": "Simple GCP Test App",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  }
+}
